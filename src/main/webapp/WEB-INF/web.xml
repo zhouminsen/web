@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns="http://xmlns.jcp.org/xml/ns/javaee"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-app_3_1.xsd"
+         version="3.1">
+
+    <servlet-mapping>
+        <servlet-name>FormServlet</servlet-name>
+        <url-pattern>/FormServlet</url-pattern>
+    </servlet-mapping>
+    <servlet>
+        <servlet-name>FormServlet</servlet-name>
+        <servlet-class>org.zjw.web.fromResubmit.FormServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>DoFormServlet</servlet-name>
+        <url-pattern>/servlet/DoFormServlet</url-pattern>
+    </servlet-mapping>
+    <servlet>
+        <servlet-name>DoFormServlet</servlet-name>
+        <servlet-class>org.zjw.web.fromResubmit.DoFormServlet</servlet-class>
+    </servlet>
+</web-app>
