@@ -29,7 +29,7 @@ public class FromResubmitController {
     }
 
 
-    @RequestMapping(value = "/submit", method = RequestMethod.POST, produces = "text/html;charset=UTF-8")
+    @RequestMapping(value = "/submit", produces = "text/html;charset=UTF-8")
     @ResponseBody
     public String submit(HttpServletRequest request) {
         //取出客户端表单中的token,如果表单中没有token则认为用户是重复提交
@@ -42,7 +42,7 @@ public class FromResubmitController {
         if (StringUtils.isEmpty(serviceToken)) {
             return "请不要重复提交";
         }
-        //判断两个客户端和服务端我token是否相同,不相同认为用户重复提交
+        //判断客户端和服务端token是否相同,不相同认为用户重复提交
         if (!Objects.equals(clientToken, serviceToken)) {
             return "请不要重复提交";
         }
@@ -51,4 +51,22 @@ public class FromResubmitController {
         request.getSession().removeAttribute("token");
         return "提交成功";
     }
+
+
+    @RequestMapping("/doForm2")
+    public String doForm2(HttpServletRequest request) {
+        //跳转到form页面
+        return "/fromResubmit/form2";
+    }
+
+
+    @RequestMapping(value = "/submit2", produces = "text/html;charset=UTF-8")
+    @ResponseBody
+    public String submit2(HttpServletRequest request) throws InterruptedException {
+        System.out.println(request.getSession().getId() + ":提交成功");
+        Thread.sleep(3000);
+        return "提交成功";
+    }
+
+
 }
