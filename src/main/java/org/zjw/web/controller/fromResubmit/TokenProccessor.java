@@ -1,4 +1,4 @@
-package org.zjw.web.fromResubmit;
+package org.zjw.web.controller.fromResubmit;
 
 import sun.misc.BASE64Encoder;
 

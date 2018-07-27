@@ -11,6 +11,9 @@
     <title>我是jsp,我天生就带有session</title>
 </head>
 <body>
-<h1>我是jsp,我天生就带有session,所以只要访问了我,<br>我就给你创建session和jsessionid</h1>
+<h1>我是jsp,我天生就带有session,所以只要访问了我,<br>我就给你创建session和jsessionid
+</h1>
+
+如果在page标签里设置session=false我就不会创建session
 </body>
 </html>
