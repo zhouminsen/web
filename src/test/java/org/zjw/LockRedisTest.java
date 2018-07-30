@@ -3,13 +3,9 @@ package org.zjw;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 import org.zjw.web.other.lock.LockRedis;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 
 /**
@@ -35,6 +31,7 @@ public class LockRedisTest extends BaseTest {
 //        redisTemplate.opsForValue().set("1", "100");
 //        redisTemplate.boundValueOps("1").increment(-1);
 //        lockRedis.lock("1");
+        redisTemplate.opsForValue().getOperations().delete(id);
 
         int num = 100;
         CountDownLatch countDownLatch = new CountDownLatch(num);
@@ -42,11 +39,10 @@ public class LockRedisTest extends BaseTest {
             Thread thread = new Thread(new Runnable() {
                 @Override
                 public void run() {
-//                    ResponseEntity<String> forEntity = restTemplate.getForEntity(url + "/unlock?id=" + id
-//                            , String.class);
+//                    ResponseEntity<String> forEntity = restTemplate.getForEntity(url + "/unlock?id=" + id, String.class);
 //                    System.out.println(forEntity.getBody());
 
-                      lockRedis.unlock(id);
+                    lockRedis.unlock(id);
 
                     countDownLatch.countDown();
                 }
@@ -63,9 +59,8 @@ public class LockRedisTest extends BaseTest {
     public void getInfo() {
         System.out.println(lockRedis.getInfo(id));
 
-      /*  ResponseEntity<String> forEntity = restTemplate.getForEntity(url + "/getInfo?id=" + id
-                , String.class);
-        System.out.println(forEntity.getBody());*/
+//        ResponseEntity<String> forEntity = restTemplate.getForEntity(url + "/getInfo?id=" + id, String.class);
+//        System.out.println(forEntity.getBody());
     }
 
 }

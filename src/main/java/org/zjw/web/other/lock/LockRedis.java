@@ -5,9 +5,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 import org.zjw.web.util.RedisLock;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 /**
  * Created by zhoum on 2018/7/30.
@@ -24,13 +22,15 @@ public class LockRedis {
     private RedisLock redisLock;
 
     //商品
-    static Map<String, Integer> products = new HashMap<>();
+    static volatile Map<String, Integer> products = new HashMap<>();
 
     //库存
-    static Map<String, Integer> stock = new HashMap<>();
+    static volatile Map<String, Integer> stock = new HashMap<>();
 
     //订单
-    static Map<String, String> orders = new HashMap<>();
+    static List<String> orders = new ArrayList<>();
+
+    volatile Integer num = 0;
 
     static {
         products.put("123456", 1000);
@@ -39,28 +39,35 @@ public class LockRedis {
 
 
     public void unlock(String id) {
-        String key = LOCK_KEY + "_" + id;
-        String value = "3000";
-        if (!redisLock.tryLock(key, value)) {
-            return;
+        String key = id;
+        String value = System.currentTimeMillis() + "2000";
+//        if (!redisLock.tryLock(key, value)) {
+//            return;
+//        }
+
+        //失败自循重试
+        while (!redisLock.tryLock(key, value)){
+
         }
         try {
             //查询该商品的库存
             Integer num = stock.get(id);
             if (num == 0) {
+                System.out.println(num);
                 return;
             } else {
                 //模拟多个用户下单
-                orders.put(UUID.randomUUID().toString(), id);
+                orders.add(id);
                 //处理业务逻辑代码
 
 
                 //逻辑走完,减库存
                 num = num - 1;
+                System.out.println(num);
                 stock.put(id, num);
             }
         } finally {
-            redisLock.unlock(LOCK_KEY, value);
+            redisLock.unlock(key, value);
         }
 
     }
