@@ -1,4 +1,4 @@
-package org.zjw.web.lock;
+package org.zjw.web.other.lock;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
