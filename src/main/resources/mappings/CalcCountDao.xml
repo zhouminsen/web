@@ -71,4 +71,5 @@
       SET t.store_count = #{storeCount}+1, t.version = #{version}+1
       WHERE t.id = #{id} AND t.version = #{version}
   </update>
+    
 </mapper>

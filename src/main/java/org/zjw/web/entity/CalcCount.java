@@ -2,8 +2,13 @@ package org.zjw.web.entity;
 
 import lombok.Data;
 
+import java.io.Serializable;
+
 @Data
-public class CalcCount {
+public class CalcCount implements Serializable {
+
+
+    private static final long serialVersionUID = -8098570595898776365L;
     /**
      * 主键
      */

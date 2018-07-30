@@ -20,7 +20,9 @@
         <jackson.version>2.6.3</jackson.version>
         <commons-pool2.version>2.2</commons-pool2.version>
         <jedis.version>2.8.1</jedis.version>
-        <classPathEntry.location>D:/work/tools/maven/Repository/mysql/mysql-connector-java/5.1.44/mysql-connector-java-5.1.44.jar</classPathEntry.location>
+        <classPathEntry.location>
+            D:/work/tools/maven/Repository/mysql/mysql-connector-java/5.1.44/mysql-connector-java-5.1.44.jar
+        </classPathEntry.location>
     </properties>
 
     <dependencies>
@@ -44,7 +46,6 @@
             <groupId>javax.servlet</groupId>
             <artifactId>jstl</artifactId>
             <version>1.2</version>
-            <scope>provided</scope>
         </dependency>
 
         <!-- 添加Spring支持 -->
@@ -161,7 +162,6 @@
         </dependency>
 
 
-
         <!-- 添加百度编辑器ueditor支持 -->
         <dependency>
             <groupId>commons-fileupload</groupId>
@@ -255,10 +255,10 @@
 
         <!-- 添加poi的支持 -->
         <dependency>
-        <groupId>org.apache.poi</groupId>
-        <artifactId>poi</artifactId>
-        <version>3.9</version>
-    </dependency>
+            <groupId>org.apache.poi</groupId>
+            <artifactId>poi</artifactId>
+            <version>3.9</version>
+        </dependency>
         <dependency>
             <groupId>org.apache.poi</groupId>
             <artifactId>poi-ooxml</artifactId>
@@ -303,16 +303,9 @@
             <artifactId>junit</artifactId>
             <version>4.11</version>
             <!-- 表示开发的时候引入，发布的时候不会加载此包 -->
-             <scope>test</scope>
+            <scope>test</scope>
         </dependency>
 
-
-
-        <dependency>
-            <groupId>javax.jms</groupId>
-            <artifactId>jms</artifactId>
-            <version>1.1</version>
-        </dependency>
 
         <!-- freemarker支持 -->
         <dependency>
@@ -407,6 +400,18 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <configuration>
                     <skip>true</skip>
+                </configuration>
+            </plugin>
+
+            <!--tomcat插件-->
+            <plugin>
+                <groupId>org.apache.tomcat.maven</groupId>
+                <artifactId>tomcat7-maven-plugin</artifactId>
+                <version>2.2</version>
+                <configuration>
+                    <path>/web</path>
+                    <port>8080</port>
+                    <uriEncoding>UTF-8</uriEncoding>
                 </configuration>
             </plugin>
 
