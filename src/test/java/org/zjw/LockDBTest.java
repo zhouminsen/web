@@ -2,7 +2,7 @@ package org.zjw;
 
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.zjw.web.lock.LockDB;
+import org.zjw.web.other.lock.LockDB;
 
 /**
  * Created by zhoum on 2018/7/27.

@@ -16,6 +16,7 @@ public class LockDB {
 
     public void lock(int id) {
         int line = 0;
+        //失败自循重试
         while (line < 1) {
             CalcCount calcCount = calcCountDao.selectByPrimaryKey(id);
             line = calcCountDao.increment(calcCount);

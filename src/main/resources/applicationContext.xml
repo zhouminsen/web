@@ -31,7 +31,7 @@
         <property name="locations">
             <list>
                 <value>classpath:properties/jdbc.properties</value>
-                <!--<value>classpath:properties/redis.properties</value>-->
+                <value>classpath:properties/redis.properties</value>
             </list>
         </property>
     </bean>
@@ -40,4 +40,6 @@
     <aop:aspectj-autoproxy/>
 
     <import resource="classpath:spring-mybatis.xml"/>
+    <import resource="classpath:spring-redis.xml"/>
+    <import resource="spring-rest.xml"/>
 </beans>
