@@ -2,8 +2,6 @@ package org.zjw;
 
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestTemplate;
 import org.zjw.web.other.lock.LockJvm;
 
@@ -14,12 +12,8 @@ import java.util.concurrent.CountDownLatch;
  */
 public class LockJvmTest extends BaseTest {
 
-    final String url = "http://127.0.0.1:8080/web/lock";
 
     String id = "123456";
-
-    @Autowired
-    private RedisTemplate redisTemplate;
 
     @Autowired
     private LockJvm lockJvm;

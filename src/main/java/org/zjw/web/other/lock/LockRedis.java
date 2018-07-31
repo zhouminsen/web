@@ -1,11 +1,13 @@
 package org.zjw.web.other.lock;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 import org.zjw.web.util.RedisLock;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Created by zhoum on 2018/7/30.
@@ -13,8 +15,6 @@ import java.util.*;
 @Component
 public class LockRedis {
 
-    @Autowired
-    private RedisTemplate redisTemplate;
 
     private final String LOCK_KEY = "calc";
 

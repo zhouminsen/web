@@ -3,7 +3,6 @@ package org.zjw;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestTemplate;
 import org.zjw.web.other.lock.LockRedis;
 
@@ -31,23 +30,19 @@ public class LockRedisTest extends BaseTest {
 
     @Test
     public void lock() throws InterruptedException {
-//        redisTemplate.opsForValue().set("1", "100");
-//        redisTemplate.boundValueOps("1").increment(-1);
-//        lockRedis.lock("1");
         redisTemplate.opsForValue().getOperations().delete(id);
 
         ExecutorService executorService = Executors.newCachedThreadPool();
-
         int num = 1000;
         CountDownLatch countDownLatch = new CountDownLatch(num);
         for (int i = 0; i < num; i++) {
             Thread thread = new Thread(new Runnable() {
                 @Override
                 public void run() {
-                    ResponseEntity<String> forEntity = restTemplate.getForEntity(url + "/unlock?id=" + id, String.class);
+//                    ResponseEntity<String> forEntity = restTemplate.getForEntity(url + "/unlock?id=" + id, String.class);
 //                    System.out.println(forEntity.getBody());
 
-//                    lockRedis.unlock(id);
+                    lockRedis.unlock(id);
 
                     countDownLatch.countDown();
                 }
@@ -55,6 +50,7 @@ public class LockRedisTest extends BaseTest {
             executorService.submit(thread);
         }
         countDownLatch.await();
+        executorService.shutdown();
         System.out.println(num + "个客人下单全部完毕");
         getInfo();
 
@@ -62,10 +58,10 @@ public class LockRedisTest extends BaseTest {
 
     @Test
     public void getInfo() {
-//        System.out.println(lockRedis.getInfo(id));
+        System.out.println(lockRedis.getInfo(id));
 
-        ResponseEntity<String> forEntity = restTemplate.getForEntity(url + "/getInfo?id=" + id, String.class);
-        System.out.println(forEntity.getBody());
+//        ResponseEntity<String> forEntity = restTemplate.getForEntity(url + "/getInfo?id=" + id, String.class);
+//        System.out.println(forEntity.getBody());
     }
 
 }
