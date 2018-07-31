@@ -36,7 +36,7 @@ public class LockJvmTest extends BaseTest {
                 @Override
                 public void run() {
                     lockJvm.unlock(id);
-                    System.out.println("完成");
+
                     countDownLatch.countDown();
                 }
             });

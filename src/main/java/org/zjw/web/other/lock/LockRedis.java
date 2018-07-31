@@ -22,10 +22,10 @@ public class LockRedis {
     private RedisLock redisLock;
 
     //商品
-    static volatile Map<String, Integer> products = new HashMap<>();
+    static  Map<String, Integer> products = new HashMap<>();
 
     //库存
-    static volatile Map<String, Integer> stock = new HashMap<>();
+    static  Map<String, Integer> stock = new HashMap<>();
 
     //订单
     static List<String> orders = new ArrayList<>();
@@ -41,19 +41,18 @@ public class LockRedis {
     public void unlock(String id) {
         String key = id;
         String value = System.currentTimeMillis() + "2000";
-//        if (!redisLock.tryLock(key, value)) {
-//            return;
-//        }
+        if (!redisLock.tryLock(key, value)) {
+            return;
+        }
 
         //失败自循重试
-        while (!redisLock.tryLock(key, value)){
+       /* while (!redisLock.tryLock(key, value)){
 
-        }
+        }*/
         try {
             //查询该商品的库存
             Integer num = stock.get(id);
             if (num == 0) {
-                System.out.println(num);
                 return;
             } else {
                 //模拟多个用户下单
@@ -63,7 +62,7 @@ public class LockRedis {
 
                 //逻辑走完,减库存
                 num = num - 1;
-                System.out.println(num);
+//                System.out.println(num);
                 stock.put(id, num);
             }
         } finally {
