@@ -1,4 +1,4 @@
-package org.zjw;
+package org.zjw.web.util;
 
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.CuratorFrameworkFactory;
@@ -18,7 +18,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 
-public class ZookeeperLock {
+public class ZookpeeperLock2 {
 
     private String lockName;
     private final int timeOut = 3000;
@@ -26,12 +26,12 @@ public class ZookeeperLock {
     private String myZnode;// 代表当前节点信息
     private String waitZnode;
     private static Logger logger = LoggerFactory
-            .getLogger(ZookeeperLock.class);
+            .getLogger(ZookpeeperLock2.class);
     private CuratorFramework client;
     private CountDownLatch latch = new CountDownLatch(1);
 
-    public ZookeeperLock(String connectString, String lockName) {
-        this.lockName = lockName;  
+    public ZookpeeperLock2(String connectString, String lockName) {
+        this.lockName = lockName;
         client = CuratorFrameworkFactory.builder().connectionTimeoutMs(timeOut)  
                 .connectString(connectString)  
                 .retryPolicy(new RetryNTimes(3, 3000)).build();  
@@ -42,7 +42,7 @@ public class ZookeeperLock {
                 if (newState == ConnectionState.CONNECTED) {  
                     logger.info("连接成功了");  
                     latch.countDown();  
-                }  
+                }
             }  
         };  
   
@@ -85,14 +85,14 @@ public class ZookeeperLock {
   
         try {  
             myZnode = client.create().withMode(CreateMode.EPHEMERAL_SEQUENTIAL)  
-                    .forPath(root + "/" + lockName);  
+                    .forPath(root + "/" + lockName);
             logger.info(myZnode + "has created");  
             // 取出所有的子节点，然后找出比自己小的节点，进行监听的设置  
             List<String> subNodes = client.getChildren().forPath(root);  
             // 取出所有带有lockname的节点信息  
             List<String> lockObjNodes = new ArrayList<String>();  
             for (String node : subNodes) {  
-                if (node.contains(lockName)) {  
+                if (node.contains(lockName)) {
                     lockObjNodes.add(node);  
                 }  
             }  

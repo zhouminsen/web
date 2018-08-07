@@ -5,6 +5,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.client.RestTemplate;
 import org.zjw.web.other.lock.LockRedis;
+import org.zjw.web.util.Service;
+import org.zjw.web.util.ThreadA;
 
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
@@ -53,7 +55,6 @@ public class LockRedisTest extends BaseTest {
         executorService.shutdown();
         System.out.println(num + "个客人下单全部完毕");
         getInfo();
-
     }
 
     @Test
@@ -63,5 +64,25 @@ public class LockRedisTest extends BaseTest {
 //        ResponseEntity<String> forEntity = restTemplate.getForEntity(url + "/getInfo?id=" + id, String.class);
 //        System.out.println(forEntity.getBody());
     }
+
+    @Test
+    public void lock2() throws InterruptedException {
+        int num = 50;
+        CountDownLatch countDownLatch = new CountDownLatch(num);
+        Service service = new Service();
+        for (int i = 0; i < num; i++) {
+            Thread thread = new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    service.seckill();
+                    countDownLatch.countDown();
+                }
+            });
+            thread.start();
+        }
+        countDownLatch.await();
+        System.out.println("执行完毕");
+    }
+
 
 }

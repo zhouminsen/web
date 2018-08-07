@@ -35,6 +35,7 @@ public class LockRedis {
     static {
         products.put("123456", 1000);
         stock.put("123456", 1000);
+
     }
 
 
