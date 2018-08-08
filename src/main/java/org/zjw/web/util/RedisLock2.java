@@ -1,5 +1,6 @@
 package org.zjw.web.util;
 
+import org.springframework.stereotype.Component;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.Transaction;
@@ -11,10 +12,10 @@ import java.util.UUID;
 /**
  * Created by liuyang on 2017/4/20.
  */
-public class DistributedLock {
+public class RedisLock2 {
     private final JedisPool jedisPool;
 
-    public DistributedLock(JedisPool jedisPool) {
+    public RedisLock2(JedisPool jedisPool) {
         this.jedisPool = jedisPool;
     }
 

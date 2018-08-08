@@ -32,4 +32,14 @@ public class RedisApiTest extends BaseTest {
         redisTemplate.opsForList().leftPop("cc", 5, TimeUnit.SECONDS);
 
     }
+
+    @Test
+    public void increment() {
+        String key = "fdf6cfbd-d19f-42ad-b0a7-b11c489d2603";
+        redisTemplate.opsForValue().set(key, "0",1000);
+        for (int i = 0; i < 50; i++) {
+            System.out.println(redisTemplate.boundValueOps(key).increment(1));
+        }
+
+    }
 }

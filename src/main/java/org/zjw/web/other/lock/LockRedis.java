@@ -16,7 +16,6 @@ import java.util.Map;
 public class LockRedis {
 
 
-    private final String LOCK_KEY = "calc";
 
     @Autowired
     private RedisLock redisLock;
@@ -39,7 +38,7 @@ public class LockRedis {
     }
 
 
-    public void unlock(String id) {
+    public void get(String id) {
         String key = id;
         String value = System.currentTimeMillis() + "2000";
         if (!redisLock.tryLock(key, value)) {

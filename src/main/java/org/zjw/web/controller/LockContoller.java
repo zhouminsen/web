@@ -17,10 +17,10 @@ public class LockContoller {
     @Autowired
     private LockRedis lockRedis;
 
-    @RequestMapping(value = "/unlock", produces = "text/plain;charset=UTF-8")
+    @RequestMapping(value = "/get", produces = "text/plain;charset=UTF-8")
     @ResponseBody
-    public String unlock(String id) {
-        lockRedis.unlock(id);
+    public String get(String id) {
+        lockRedis.get(id);
         return "完成";
     }
 

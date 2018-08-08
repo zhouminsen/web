@@ -22,7 +22,7 @@ public class Service {
         pool = new JedisPool(config, "127.0.0.1", 6379, 3000);
     }
 
-    DistributedLock lock = new DistributedLock(pool);
+    RedisLock2 lock = new RedisLock2(pool);
 
     int n = 500;
 
