@@ -126,7 +126,6 @@ public class FromResubmitController {
         //确定本次请求不是重复提交,移除redis中的token
         Thread.sleep(5000);
         stringRedisTemplate.delete(clientToken);
-        System.out.println("来了2");
 
         //处理逻辑
         return "提交成功";
