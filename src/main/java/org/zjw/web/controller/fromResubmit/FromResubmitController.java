@@ -1,9 +1,7 @@
 package org.zjw.web.controller.fromResubmit;
 
 import org.apache.commons.lang3.StringUtils;
-import org.jsoup.select.Evaluator;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -49,7 +47,7 @@ public class FromResubmitController {
         if (StringUtils.isEmpty(clientToken)) {
             return "请不要重复提交";
         }
-        //取出服务端当前用户session中的token,如果为空则认为用户重复提交
+        //取出服务端当前用户session中的token,如果为空则认为用户重复提交aaa
         String serviceToken = (String) request.getSession().getAttribute("token");
         if (StringUtils.isEmpty(serviceToken)) {
             return "请不要重复提交";
