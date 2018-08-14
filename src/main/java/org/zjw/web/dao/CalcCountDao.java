@@ -4,7 +4,7 @@ package org.zjw.web.dao;
 import org.springframework.stereotype.Repository;
 import org.zjw.web.entity.CalcCount;
 
-@Repository
+
 public interface CalcCountDao {
     /**
      * @mbg.generated 2018-07-27
