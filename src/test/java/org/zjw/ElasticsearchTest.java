@@ -2,14 +2,13 @@ package org.zjw;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
-import org.apache.logging.log4j.core.util.JsonUtils;
-import org.apache.lucene.spatial.prefix.NumberRangePrefixTreeStrategy;
-import org.apache.xmlbeans.impl.xb.xsdschema.Facet;
 import org.elasticsearch.action.bulk.BulkRequestBuilder;
 import org.elasticsearch.action.bulk.BulkResponse;
 import org.elasticsearch.action.delete.DeleteRequestBuilder;
 import org.elasticsearch.action.delete.DeleteResponse;
 import org.elasticsearch.action.get.GetResponse;
+import org.elasticsearch.action.get.MultiGetItemResponse;
+import org.elasticsearch.action.get.MultiGetResponse;
 import org.elasticsearch.action.index.IndexRequestBuilder;
 import org.elasticsearch.action.index.IndexResponse;
 import org.elasticsearch.action.search.SearchRequestBuilder;
@@ -18,14 +17,18 @@ import org.elasticsearch.action.update.UpdateResponse;
 import org.elasticsearch.client.transport.TransportClient;
 import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.common.transport.TransportAddress;
+import org.elasticsearch.common.unit.Fuzziness;
 import org.elasticsearch.common.xcontent.XContentBuilder;
 import org.elasticsearch.common.xcontent.XContentFactory;
 import org.elasticsearch.common.xcontent.XContentType;
-import org.elasticsearch.index.query.BoolQueryBuilder;
-import org.elasticsearch.index.query.MatchQueryBuilder;
-import org.elasticsearch.index.query.QueryBuilders;
-import org.elasticsearch.index.query.RangeQueryBuilder;
+import org.elasticsearch.index.query.*;
 import org.elasticsearch.search.SearchHit;
+import org.elasticsearch.search.SearchHits;
+import org.elasticsearch.search.aggregations.Aggregation;
+import org.elasticsearch.search.aggregations.AggregationBuilders;
+import org.elasticsearch.search.aggregations.Aggregations;
+import org.elasticsearch.search.aggregations.bucket.terms.Terms;
+import org.elasticsearch.search.aggregations.bucket.terms.TermsAggregationBuilder;
 import org.elasticsearch.transport.client.PreBuiltTransportClient;
 import org.junit.After;
 import org.junit.Before;
@@ -38,19 +41,17 @@ import org.zjw.web.util.RandomName;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Random;
+import java.util.*;
 
 
 /**
+ * 参考:https://blog.csdn.net/liuxiao723846/article/details/78709919
  * Elasticsearch的基本测试
  *
- * @author sunt
+ * @author zjw
  * @version V1.0
  * @ClassName: ElasticsearchTest
- * @date 2017年11月22日
+ * @date 2018年8月13日
  */
 public class ElasticsearchTest {
 
@@ -108,7 +109,7 @@ public class ElasticsearchTest {
      */
     @Test
     public void addIndex1() throws IOException {
-        IndexResponse response = client.prepareIndex("msg", "tweet", "1").
+        IndexResponse response = client.prepareIndex("msg", "tweet", "3").
                 setSource(XContentFactory.jsonBuilder()
                         .startObject().field("userName", "张三")
                         .field("sendDate", new Date())
@@ -199,6 +200,15 @@ public class ElasticsearchTest {
         logger.info("索引库的数据:" + getResponse.getSourceAsString());
     }
 
+    @Test
+    public void getData2() {
+        MultiGetResponse multiGetItemResponses = client.prepareMultiGet().add("msg", "tweet", "1", "2", "3").get();
+        for (MultiGetItemResponse itemResponse : multiGetItemResponses) {
+            GetResponse getResponse = itemResponse.getResponse();
+            logger.info("索引库的数据:" + getResponse.getSourceAsString());
+        }
+    }
+
     /**
      * 更新索引库数据
      *
@@ -211,11 +221,12 @@ public class ElasticsearchTest {
     public void updateData() {
         JSONObject jsonObject = new JSONObject();
 
-        jsonObject.put("userName", "王五");
-        jsonObject.put("sendDate", "2008-08-08");
-        jsonObject.put("msg", "你好,张三，好久不见");
+//        jsonObject.put("userName", "王五");
+//        jsonObject.put("sendDate", "2008-08-08");
+//        jsonObject.put("msg", "你好,张三，好久不见");
+        jsonObject.put("age", 11);
 
-        UpdateResponse updateResponse = client.prepareUpdate("msg", "tweet", "1")
+        UpdateResponse updateResponse = client.prepareUpdate("java_demo_index", "bulk_user", "5")
                 .setDoc(jsonObject.toString(), XContentType.JSON).get();
 
         logger.info("updateResponse索引名称:" + updateResponse.getIndex() + "\n updateResponse类型:" + updateResponse.getType()
@@ -227,7 +238,7 @@ public class ElasticsearchTest {
      *
      * @return void
      * @Title: deleteData
-     * @author sunt
+     * @author zehe5y
      * @date 2017年11月23日
      */
     @Test
@@ -299,14 +310,14 @@ public class ElasticsearchTest {
 
     }
 
+
     /**
      * 搜索
      *
      * @param
      */
     @Test
-    public void executeSearch() {
-
+    public void matchQuery() {
         MatchQueryBuilder builder = QueryBuilders.matchQuery("position", "technique");
         RangeQueryBuilder rangeQueryBuilder = QueryBuilders.rangeQuery("age").from(30).to(40);
         SearchResponse response = client.prepareSearch("company").setTypes("employee").setQuery(builder)
@@ -315,11 +326,12 @@ public class ElasticsearchTest {
                 .setSize(1) //设置搜索结果个数
                 .get();
         SearchHit[] hits = response.getHits().getHits();
-        System.out.println(1234);
+        System.out.println("查询出来的结果:");
         for (int i = 0; i < hits.length; i++) {
             System.out.println(hits[i].getSourceAsString());
         }
     }
+
 
     /**
      * boolean搜索
@@ -327,7 +339,7 @@ public class ElasticsearchTest {
      * @param
      */
     @Test
-    public void executeSearch2() {
+    public void boolQuery() {
         BoolQueryBuilder query = QueryBuilders.boolQuery().
                 must(QueryBuilders.matchQuery("position", "finance"))
 //                .must(QueryBuilders.rangeQuery("age").lte(25))
@@ -340,6 +352,231 @@ public class ElasticsearchTest {
             System.out.println(hits[i].getSourceAsString());
         }
     }
+
+
+    /**
+     * 搜索全部
+     *
+     * @param
+     */
+    @Test
+    public void matchAllQuery() {
+        QueryBuilder builder = QueryBuilders.matchAllQuery();
+        SearchResponse response = client.prepareSearch("company").setTypes("employee").setQuery(builder)
+                .setFrom(0)
+                .get();
+        SearchHit[] hits = response.getHits().getHits();
+        System.out.println("查询出来的结果:");
+        for (int i = 0; i < hits.length; i++) {
+            System.out.println(hits[i].getSourceAsString());
+        }
+    }
+
+
+    /**
+     * 多个字段搜索
+     *
+     * @param
+     */
+    @Test
+    public void multiMatchQuery() {
+        //在age,weight字段中匹配68
+        QueryBuilder qb = QueryBuilders.multiMatchQuery("68", "age", "weight").operator(Operator.OR);
+        SearchResponse searchResponse = client.prepareSearch("java_demo_index").setTypes("bulk_user").setQuery(qb).get();
+        SearchHits hits = searchResponse.getHits();
+        long totalHits = hits.getTotalHits();
+        SearchHit[] hits2 = hits.getHits();
+        for (SearchHit sh : hits2) {
+            Map<String, Object> source = sh.getSourceAsMap();
+            String id = sh.getId();
+            //sh.getScore();
+            System.out.println(totalHits + "," + source + "," + id);
+        }
+
+    }
+
+    /**
+     * 搜索
+     *
+     * @param
+     */
+    @Test
+    public void queryStringQuery() {
+        //所有field匹配
+        QueryBuilder qb = QueryBuilders.queryStringQuery("Berry");
+        SearchResponse searchResponse = client.prepareSearch("java_demo_index").setTypes("bulk_user").setQuery(qb).get();
+        SearchHits hits = searchResponse.getHits();
+        long totalHits = hits.getTotalHits();
+        SearchHit[] hits2 = hits.getHits();
+        for (SearchHit sh : hits2) {
+            Map<String, Object> source = sh.getSourceAsMap();
+            String id = sh.getId();
+            //sh.getScore();
+            System.out.println(totalHits + "," + source + "," + id);
+        }
+
+    }
+
+    /**
+     * 短语查询
+     */
+    @Test
+    public void termQuery() {
+        QueryBuilder qb = QueryBuilders.termsQuery("name", "steve", "stacy");
+        SearchResponse searchResponse = client.prepareSearch("java_demo_index").setTypes("bulk_user").setQuery(qb).get();
+        SearchHits hits = searchResponse.getHits();
+        long totalHits = hits.getTotalHits();
+        SearchHit[] hits2 = hits.getHits();
+        for (SearchHit sh : hits2) {
+            Map<String, Object> source = sh.getSourceAsMap();
+            String id = sh.getId();
+            //sh.getScore();
+            System.out.println(totalHits + "," + source + "," + id);
+        }
+    }
+
+    /**
+     * 前缀查询(必须匹配短词的前面部分或整个)
+     */
+    @Test
+    public void prefixQuery() {
+        QueryBuilder qb = QueryBuilders.prefixQuery("name", "st");
+        SearchResponse searchResponse = client.prepareSearch("java_demo_index").setTypes("bulk_user").setQuery(qb).get();
+        SearchHits hits = searchResponse.getHits();
+        long totalHits = hits.getTotalHits();
+        SearchHit[] hits2 = hits.getHits();
+        for (SearchHit sh : hits2) {
+            Map<String, Object> source = sh.getSourceAsMap();
+            String id = sh.getId();
+            //sh.getScore();
+            System.out.println(totalHits + "," + source + "," + id);
+        }
+    }
+
+    /**
+     * 短词匹配(必须匹配短词或整词的全部)
+     */
+    @Test
+    public void matchPhraseQuery() {
+        QueryBuilder qb = QueryBuilders.matchPhraseQuery("name", "steve rose");
+        SearchResponse searchResponse = client.prepareSearch("java_demo_index").setTypes("bulk_user").setQuery(qb).get();
+        SearchHits hits = searchResponse.getHits();
+        long totalHits = hits.getTotalHits();
+        SearchHit[] hits2 = hits.getHits();
+        for (SearchHit sh : hits2) {
+            Map<String, Object> source = sh.getSourceAsMap();
+            String id = sh.getId();
+            //sh.getScore();
+            System.out.println(totalHits + "," + source + "," + id);
+        }
+    }
+
+    /**
+     * 短语前缀匹配
+     */
+    @Test
+    public void matchPhrasePrefixQuery() {
+        QueryBuilder qb = QueryBuilders.matchPhrasePrefixQuery("name", "steve").slop(3).maxExpansions(2);
+
+        SearchResponse searchResponse = client.prepareSearch("java_demo_index").setTypes("bulk_user").setQuery(qb).get();
+        SearchHits hits = searchResponse.getHits();
+        //long totalHits = hits.getTotalHits();
+        SearchHit[] hits2 = hits.getHits();
+        for (SearchHit sh : hits2) {
+            Map<String, Object> source = sh.getSourceAsMap();
+            String id = sh.getId();
+            float score = sh.getScore();
+            System.out.println("source:" + source + ",id:" + id + ",score:" + score);
+        }
+    }
+
+
+    /**
+     * 模糊查询（fuzzy）
+     * Fuzziness.fromEdits(2) 错误匹配个数
+     */
+    @Test
+    public void fuzzyQuery() {
+        QueryBuilder qb = QueryBuilders.fuzzyQuery("name", "seeee").fuzziness(Fuzziness.fromEdits(2));
+//                .prefixLength(2).maxExpansions(50);
+        SearchResponse searchResponse = client.prepareSearch("java_demo_index").setTypes("bulk_user").setQuery(qb).get();
+        SearchHits hits = searchResponse.getHits();
+        //long totalHits = hits.getTotalHits();
+        SearchHit[] hits2 = hits.getHits();
+        for (SearchHit sh : hits2) {
+            Map<String, Object> source = sh.getSourceAsMap();
+            String id = sh.getId();
+            float score = sh.getScore();
+            System.out.println("source:" + source + ",id:" + id + ",score:" + score);
+        }
+    }
+
+    /**
+     * 通配符查询
+     */
+    @Test
+    public void wildCardQuery() {
+        QueryBuilder qb = QueryBuilders.wildcardQuery("name", "st*");
+        SearchResponse searchResponse = client.prepareSearch("java_demo_index").setTypes("bulk_user").setQuery(qb).get();
+        SearchHits hits = searchResponse.getHits();
+        //long totalHits = hits.getTotalHits();
+        SearchHit[] hits2 = hits.getHits();
+        for (SearchHit sh : hits2) {
+            Map<String, Object> source = sh.getSourceAsMap();
+            String id = sh.getId();
+            float score = sh.getScore();
+            System.out.println("source:" + source + ",id:" + id + ",score:" + score);
+        }
+    }
+
+
+    @Test
+    public void aggre1Query2() {
+        SearchRequestBuilder srb =  client.prepareSearch("java_demo_index").setTypes("bulk_user");
+//        srb.setSearchType(SearchType.COUNT);
+        TermsAggregationBuilder teamAgg = AggregationBuilders.terms("player_count").field("married");
+        srb.addAggregation(teamAgg);
+        System.out.println(srb.toString());
+
+        SearchResponse searchResponse = srb.execute().actionGet();
+        Aggregations aggregations = searchResponse.getAggregations();
+        Map<String, Aggregation> asMap = aggregations.asMap();
+        Terms terms = (Terms) asMap.get("player_count");
+
+        List<? extends Terms.Bucket> buckets = terms.getBuckets();
+        for (Terms.Bucket bt : buckets) {
+            logger.info(bt.getKeyAsString() + " :: " + bt.getDocCount());
+        }
+    }
+
+    @Test
+    public  void aggreQuery1() {
+        SearchRequestBuilder srb =  client.prepareSearch("java_demo_index").setTypes("bulk_user");
+//        srb.setSearchType(SearchType.COUNT);
+
+        TermsAggregationBuilder teamAgg= AggregationBuilders.terms("married_count").field("married");
+        TermsAggregationBuilder positionAgg= AggregationBuilders.terms("age_count").field("age");
+        teamAgg.subAggregation(positionAgg);
+
+        srb.addAggregation(teamAgg);
+        System.out.println(srb.toString());
+
+        SearchResponse searchResponse = srb.execute().actionGet();
+        Aggregations aggregations = searchResponse.getAggregations();//team agg
+        Terms terms = aggregations.get("married_count");
+        List<? extends Terms.Bucket> buckets = terms.getBuckets();
+        for (Terms.Bucket bt : buckets) {
+            logger.info(bt.getKeyAsString() + " :: " + bt.getDocCount());
+
+            Aggregations aggregations2 = bt.getAggregations();//position agg
+            Terms terms2 = aggregations2.get("age_count");
+            List<? extends Terms.Bucket> buckets2 = terms2.getBuckets();
+            for (Terms.Bucket bt2 : buckets2) {
+                logger.info("---"+bt2.getKeyAsString() + " :: " + bt2.getDocCount());
+            }
+        }
+    }
+
 
 
     /**
@@ -394,7 +631,7 @@ public class ElasticsearchTest {
 
     //分组统计, 按married分组，统计出结婚和未婚的各多少
     @Test
-    public void facet(){
+    public void facet() {
     }
 
 }
