@@ -8,6 +8,7 @@
 <body>
 <form action="${pageContext.request.contextPath}/fromResubmit/submit2" method="post" onsubmit="preEvent()">
     用户名：<input type="text" name="username">
+    <br>
     <input type="submit" value="提交" id="submit_id">
 </form>
 <script type="application/javascript">
