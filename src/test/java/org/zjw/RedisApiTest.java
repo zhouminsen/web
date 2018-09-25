@@ -21,6 +21,7 @@ public class RedisApiTest extends BaseTest {
     @Test
     public void list() {
         String list_key = "list";
+        https://github.com/Snailclimb/JavaGuide
 
         redisTemplate.delete(list_key);
         redisTemplate.opsForList().leftPushAll(list_key, "1", "2", "3", "4", "5", "6", "7", "8", "9");

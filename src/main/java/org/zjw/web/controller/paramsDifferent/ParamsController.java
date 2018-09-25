@@ -21,8 +21,6 @@ import java.util.UUID;
 @RequestMapping("/params")
 public class ParamsController {
 
-    @Autowired
-    private StringRedisTemplate stringRedisTemplate;
 
 
     @RequestMapping("/doForm")

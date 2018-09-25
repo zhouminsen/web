@@ -27,7 +27,7 @@ public class OtherController {
             return "Android终端访问";
         } else if (userAgent.contains("iPhone".toLowerCase())) {
             return "IOS终端访问";
-        } else if (userAgent.contains("Windows".toLowerCase())) {
+        } else if (userAgent.contains("Window   s".toLowerCase())) {
             return "Windows终端访问";
         }
         return "未知终端";

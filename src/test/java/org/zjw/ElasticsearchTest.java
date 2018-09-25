@@ -57,7 +57,7 @@ public class ElasticsearchTest {
 
     private Logger logger = LoggerFactory.getLogger(ElasticsearchTest.class);
 
-    public final static String HOST = "192.168.1.113";
+    public final static String HOST = "127.0.0.1";
 
     public final static int PORT = 9300;//http请求的端口是9200，客户端是9300
     private TransportClient client = null;
@@ -200,6 +200,9 @@ public class ElasticsearchTest {
         logger.info("索引库的数据:" + getResponse.getSourceAsString());
     }
 
+    /**
+     * 多选条件
+     */
     @Test
     public void getData2() {
         MultiGetResponse multiGetItemResponses = client.prepareMultiGet().add("msg", "tweet", "1", "2", "3").get();
@@ -325,6 +328,7 @@ public class ElasticsearchTest {
                 .setFrom(0)
                 .setSize(1) //设置搜索结果个数
                 .get();
+        System.out.println(builder.toString());
         SearchHit[] hits = response.getHits().getHits();
         System.out.println("查询出来的结果:");
         for (int i = 0; i < hits.length; i++) {
@@ -405,6 +409,7 @@ public class ElasticsearchTest {
         //所有field匹配
         QueryBuilder qb = QueryBuilders.queryStringQuery("Berry");
         SearchResponse searchResponse = client.prepareSearch("java_demo_index").setTypes("bulk_user").setQuery(qb).get();
+        System.out.println(qb.toString());
         SearchHits hits = searchResponse.getHits();
         long totalHits = hits.getTotalHits();
         SearchHit[] hits2 = hits.getHits();
@@ -529,33 +534,17 @@ public class ElasticsearchTest {
         }
     }
 
-
+    /**
+     * 聚合分组查询
+     * 根据married和age进行分组
+     */
     @Test
-    public void aggre1Query2() {
-        SearchRequestBuilder srb =  client.prepareSearch("java_demo_index").setTypes("bulk_user");
-//        srb.setSearchType(SearchType.COUNT);
-        TermsAggregationBuilder teamAgg = AggregationBuilders.terms("player_count").field("married");
-        srb.addAggregation(teamAgg);
-        System.out.println(srb.toString());
-
-        SearchResponse searchResponse = srb.execute().actionGet();
-        Aggregations aggregations = searchResponse.getAggregations();
-        Map<String, Aggregation> asMap = aggregations.asMap();
-        Terms terms = (Terms) asMap.get("player_count");
-
-        List<? extends Terms.Bucket> buckets = terms.getBuckets();
-        for (Terms.Bucket bt : buckets) {
-            logger.info(bt.getKeyAsString() + " :: " + bt.getDocCount());
-        }
-    }
-
-    @Test
-    public  void aggreQuery1() {
-        SearchRequestBuilder srb =  client.prepareSearch("java_demo_index").setTypes("bulk_user");
+    public void aggreQuery1() {
+        SearchRequestBuilder srb = client.prepareSearch("java_demo_index").setTypes("bulk_user");
 //        srb.setSearchType(SearchType.COUNT);
 
-        TermsAggregationBuilder teamAgg= AggregationBuilders.terms("married_count").field("married");
-        TermsAggregationBuilder positionAgg= AggregationBuilders.terms("age_count").field("age");
+        TermsAggregationBuilder teamAgg = AggregationBuilders.terms("married_count").field("married");
+        TermsAggregationBuilder positionAgg = AggregationBuilders.terms("age_count").field("age");
         teamAgg.subAggregation(positionAgg);
 
         srb.addAggregation(teamAgg);
@@ -572,11 +561,35 @@ public class ElasticsearchTest {
             Terms terms2 = aggregations2.get("age_count");
             List<? extends Terms.Bucket> buckets2 = terms2.getBuckets();
             for (Terms.Bucket bt2 : buckets2) {
-                logger.info("---"+bt2.getKeyAsString() + " :: " + bt2.getDocCount());
+                logger.info("---" + bt2.getKeyAsString() + " :: " + bt2.getDocCount());
             }
         }
     }
 
+
+    /**
+     * 聚合分组查询
+     * 根据age进行分组
+     */
+    @Test
+    public void aggre1Query2() {
+        SearchRequestBuilder srb = client.prepareSearch("java_demo_index").setTypes("bulk_user");
+//        srb.setSearchType(SearchType.COUNT);
+        TermsAggregationBuilder teamAgg = AggregationBuilders.terms("age_count").field("age");
+        srb.addAggregation(teamAgg);
+        srb.setSize(1000);
+        System.out.println(srb.toString());
+
+        SearchResponse searchResponse = srb.execute().actionGet();
+        Aggregations aggregations = searchResponse.getAggregations();
+        Map<String, Aggregation> asMap = aggregations.asMap();
+        Terms terms = (Terms) asMap.get("age_count");
+
+        List<? extends Terms.Bucket> buckets = terms.getBuckets();
+        for (Terms.Bucket bt : buckets) {
+            logger.info(bt.getKeyAsString() + " :: " + bt.getDocCount());
+        }
+    }
 
 
     /**
