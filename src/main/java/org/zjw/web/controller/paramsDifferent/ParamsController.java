@@ -9,8 +9,11 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.zjw.web.entity.User;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -20,7 +23,6 @@ import java.util.UUID;
 @Controller
 @RequestMapping("/params")
 public class ParamsController {
-
 
 
     @RequestMapping("/doForm")
@@ -52,12 +54,18 @@ public class ParamsController {
         return user;
     }
 
+    @RequestMapping(value = "/submit4")
+    @ResponseBody
+    public parent submit4(parent parent) {
+
+        return parent;
+    }
 
     @Data
-    private static class User {
-        private String username;
+    private static class parent {
+        private List<org.zjw.web.entity.User> userList = new ArrayList<>();
 
-        private Integer age;
+        private User user;
 
     }
 

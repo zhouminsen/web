@@ -22,7 +22,7 @@ DROP TABLE IF EXISTS `calc_count`;
 CREATE TABLE `calc_count` (
   `id` int(11) NOT NULL AUTO_INCREMENT COMMENT '主键',
   `store_count` int(11) DEFAULT NULL COMMENT '库存',
-  `name` varchar(3) DEFAULT NULL COMMENT '名称',
+  `name` varchar(50) DEFAULT NULL COMMENT '名称',
   `version` int(11) DEFAULT NULL COMMENT '版本号',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8 COMMENT='计算表';
