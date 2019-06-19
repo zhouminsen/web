@@ -1,5 +1,6 @@
 package org.zjw.web.util;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.dao.DataAccessException;
 import org.springframework.data.redis.core.RedisOperations;
 import org.springframework.data.redis.core.SessionCallback;
@@ -16,6 +17,8 @@ import java.util.concurrent.TimeUnit;
 public class LockUtil {
 
     private StringRedisTemplate stringRedisTemplate;
+
+    String lockKey = "account";
 
     public LockUtil(StringRedisTemplate stringRedisTemplate) {
         this.stringRedisTemplate = stringRedisTemplate;
@@ -57,8 +60,8 @@ public class LockUtil {
             LockModel e = setLock(item, expire);
             if (!e.getFlag()) {
                 //加锁失败需要把之前加的锁释放
-                unlock(lockModel);
-                lockModel.getLockModels().clear();
+                /*unlock(lockModel);
+                lockModel.getLockModels().clear();*/
                 lockModel.setFlag(Boolean.FALSE);
                 return lockModel;
             }
@@ -70,6 +73,17 @@ public class LockUtil {
 
     public LockModel setLock(String set, Long expire) {
         LockModel lockModel = new LockModel();
+        //获取当前key值
+        String v = get(set);
+        if (!StringUtils.isEmpty(v)) {
+            long ev = Long.parseLong(v);
+            long curv = System.currentTimeMillis();
+            //当前还未过期,说明该key被其他线程占用
+            if (ev < curv) {
+                lockModel.setFlag(Boolean.FALSE);
+                return lockModel;
+            }
+        }
         Boolean aBoolean = tryingLock(set, expire);
         if (!aBoolean) {
             lockModel.setFlag(Boolean.FALSE);
@@ -82,6 +96,7 @@ public class LockUtil {
 
     private Boolean tryingLock(String key, Long expire) {
         String lockKey = "account";
+        String l = (System.currentTimeMillis() + expire) + "";
         SessionCallback<Boolean> sessionCallback = new SessionCallback<Boolean>() {
             List<Object> exec = null;
 
@@ -89,14 +104,16 @@ public class LockUtil {
             @SuppressWarnings("unchecked")
             public Boolean execute(RedisOperations operations) throws DataAccessException {
                 operations.multi();
-                stringRedisTemplate.opsForSet().add(lockKey, key);
+//                stringRedisTemplate.opsForSet().add(lockKey, key);
+                stringRedisTemplate.opsForHash().putIfAbsent(lockKey, key, l);
                 stringRedisTemplate.expire(lockKey, expire, TimeUnit.SECONDS);
                 exec = operations.exec();
                 if (exec.size() > 0) {
-                    long i = (long) exec.get(0);
-                    if (i == 1) {
+                    Boolean o = (Boolean) exec.get(0);
+                    /*if (i == 1) {
                         return Boolean.TRUE;
-                    }
+                    }*/
+                    return o;
                 }
                 return Boolean.FALSE;
             }
@@ -104,16 +121,21 @@ public class LockUtil {
         return stringRedisTemplate.execute(sessionCallback);
     }
 
+
+    public String get(String key) {
+        String v = (String) stringRedisTemplate.opsForHash().get(lockKey, key);
+        return v;
+    }
+
     public void unlock(LockModel lockModel) {
         delete(lockModel.getLockModels());
     }
 
     private void delete(HashSet<String> keys) {
-        String lockKey = "account";
         Boolean aBoolean = stringRedisTemplate.hasKey(lockKey);
         if (aBoolean) {
             for (String item : keys) {
-                stringRedisTemplate.boundSetOps(lockKey).remove(item);
+                stringRedisTemplate.boundHashOps(lockKey).delete(item);
             }
         }
     }

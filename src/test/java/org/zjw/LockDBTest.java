@@ -41,7 +41,8 @@ public class LockDBTest extends BaseTest {
 
     @Test
     public void lock2() throws InterruptedException {
-        int num = 100;
+        int num = 50;
+        //先插入一条初始化线程池
         lockDB.lock(1);
         CountDownLatch start = new CountDownLatch(1);
         CountDownLatch end = new CountDownLatch(num);

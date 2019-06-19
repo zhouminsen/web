@@ -5,6 +5,7 @@ import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.TransactionDefinition;
 import org.springframework.transaction.TransactionStatus;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.DefaultTransactionDefinition;
 import org.springframework.transaction.support.TransactionCallback;
 import org.springframework.transaction.support.TransactionTemplate;
@@ -72,5 +73,24 @@ public class CalcCountService {
             transactionManager.rollback(transStatus);
             throw new Exception(e.toString(), e);
         }
+    }
+
+    public void transaction3() throws Exception {
+        transaction4();
+
+    }
+
+    @Transactional
+    public void transaction4() throws Exception {
+        CalcCount calcCount = new CalcCount();
+        calcCount.setName("伟哥来了");
+        calcCount.setStoreCount(1);
+        calcCount.setVersion(1);
+        calcCountDao.insertSelective(calcCount);
+        int i = 1 / 0;
+        calcCount.setName("伟哥来了2");
+        calcCount.setStoreCount(2);
+        calcCount.setVersion(2);
+        calcCountDao.insertSelective(calcCount);
     }
 }

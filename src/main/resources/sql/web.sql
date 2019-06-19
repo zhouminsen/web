@@ -30,4 +30,4 @@ CREATE TABLE `calc_count` (
 -- ----------------------------
 -- Records of calc_count
 -- ----------------------------
-INSERT INTO `calc_count` VALUES ('1', '1', '热干面', '1');
+INSERT INTO `calc_count` VALUES ('1', '0', '热干面', '0');

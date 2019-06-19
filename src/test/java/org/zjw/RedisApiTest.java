@@ -69,10 +69,11 @@ public class RedisApiTest extends BaseTest {
     public void lock() {
         LockUtil lockUtil = new LockUtil(stringRedisTemplate);
         HashSet<String> strings = new HashSet<>(Arrays.asList("1", "2", "3", "4"));
-        LockModel lockModel = lockUtil.setRangeLock(strings, 100L);
+        LockModel lockModel = lockUtil.setRangeLock(strings, 30L);
+        stringRedisTemplate.boundHashOps("account").expire(30L, TimeUnit.SECONDS);
         strings.clear();
         strings.addAll(Arrays.asList("0", "1"));
-        LockModel lockModel2 = lockUtil.setRangeLock(strings, 100L);
+        LockModel lockModel2 = lockUtil.setRangeLock(strings, 30L);
         lockUtil.unlock(lockModel);
         lockUtil.unlock(lockModel2);
 
