@@ -1,8 +1,11 @@
 package org.zjw.web.controller;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.zjw.web.service.CalcService;
+import org.zjw.web.service.UserService;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -12,6 +15,9 @@ import javax.servlet.http.HttpServletRequest;
 @Controller
 @RequestMapping("/other")
 public class OtherController {
+
+    @Autowired
+    private UserService userService;
 
     /**
      * 获取终端
@@ -33,4 +39,15 @@ public class OtherController {
         return "未知终端";
     }
 
+
+    /**
+     * 测试对象代理
+     *
+     * @param request
+     * @return
+     */
+    @RequestMapping(value = "/testProxyObject", produces = "text/html;charset=UTF-8")
+    public void testProxyObject(HttpServletRequest request) {
+        System.out.println(userService);
+    }
 }

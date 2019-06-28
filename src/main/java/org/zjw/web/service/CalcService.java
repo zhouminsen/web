@@ -18,11 +18,6 @@ import org.zjw.web.entity.CalcCount;
 @Service
 public class CalcService {
 
-    @Autowired
-    private CalcCountDao calcCountDao;
-
-    @Autowired
-    private DataSourceTransactionManager transactionManager;
 
     @Autowired
     private CalcCountService calcCountService;

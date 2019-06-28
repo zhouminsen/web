@@ -2,6 +2,7 @@ package org.zjw.web.other.lock;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 import org.zjw.web.util.RedisLock;
 
 import java.util.ArrayList;
@@ -16,15 +17,14 @@ import java.util.Map;
 public class LockRedis {
 
 
-
     @Autowired
     private RedisLock redisLock;
 
     //商品
-    static  Map<String, Integer> products = new HashMap<>();
+    static Map<String, Integer> products = new HashMap<>();
 
     //库存
-    static  Map<String, Integer> stock = new HashMap<>();
+    static Map<String, Integer> stock = new HashMap<>();
 
     //订单
     static List<String> orders = new ArrayList<>();
