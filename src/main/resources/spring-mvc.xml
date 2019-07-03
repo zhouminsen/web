@@ -87,8 +87,8 @@
         <property name="maxInMemorySize" value="40960"/>
     </bean>
 
-    <mvc:resources location="/js" mapping="/**"/>
     <!--location 资源具体位置  mapping 资源映射路径-->
-    <!--<mvc:resources location="/static/images/" mapping="/static/images/**" />-->
+    <mvc:resources location="/js/" mapping="/js/**"/>
+    <mvc:resources location="/images/" mapping="/images/**"/>
 
 </beans>
