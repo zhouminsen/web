@@ -6,12 +6,14 @@ import org.springframework.dao.DataAccessException;
 import org.springframework.data.redis.core.RedisOperations;
 import org.springframework.data.redis.core.SessionCallback;
 import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.data.redis.core.ZSetOperations;
 import org.zjw.web.util.LockModel;
 import org.zjw.web.util.LockUtil;
 
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -59,6 +61,23 @@ public class RedisApiTest extends BaseTest {
         System.out.println("我add进去了吗" + setLock("1", 50L));
         System.out.println("我add进去了吗" + setLock("2", 50L));
         unlock("1");
+
+    }
+
+    /**
+     * 测试zset
+     */
+    @Test
+    public void zset() {
+        String set_key = "zset";
+        stringRedisTemplate.opsForZSet().add("1", "周家伟2", 1.2);
+        stringRedisTemplate.opsForZSet().add("1", "周家伟1", 1.1);
+        stringRedisTemplate.opsForZSet().add("1", "周家伟3", 1.5);
+        stringRedisTemplate.opsForZSet().add("1", "周家伟4", 1.3);
+        Set<ZSetOperations.TypedTuple<String>> typedTuples = stringRedisTemplate.boundZSetOps("1").rangeWithScores(1, 5);
+        for (ZSetOperations.TypedTuple<String> item : typedTuples) {
+            System.out.println(item.getValue() + ":" + item.getScore());
+        }
 
     }
 
