@@ -1,21 +1,15 @@
 package org.zjw.web.controller.paramsDifferent;
 
 import lombok.Data;
-import lombok.NoArgsConstructor;
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.zjw.web.entity.User;
+import org.zjw.web.entity.User2;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
-import java.util.UUID;
 
 /**
  * Created by zhoum on 2018/8/23.
@@ -34,14 +28,14 @@ public class ParamsController {
 
     @RequestMapping(value = "/submit", produces = "application/json;charset=UTF-8")
     @ResponseBody
-    public User submit(User user) {
+    public User2 submit(User2 user) {
 
         return user;
     }
 
     @RequestMapping(value = "/submit2", produces = "application/json;charset=UTF-8")
     @ResponseBody
-    public User submit2(@RequestBody User user) {
+    public User2 submit2(@RequestBody User2 user) {
 
         return user;
     }
@@ -61,11 +55,19 @@ public class ParamsController {
         return parent;
     }
 
+
+    @RequestMapping(value = "/submit5")
+    @ResponseBody
+    public String submit5() {
+
+        return "hahahaha";
+    }
+
     @Data
     private static class parent {
-        private List<org.zjw.web.entity.User> userList = new ArrayList<>();
+        private List<User2> userList = new ArrayList<>();
 
-        private User user;
+        private User2 user;
 
     }
 

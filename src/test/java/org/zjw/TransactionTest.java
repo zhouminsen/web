@@ -2,6 +2,7 @@ package org.zjw;
 
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
 import org.zjw.web.service.CalcCountService;
 import org.zjw.web.service.CalcService;
 

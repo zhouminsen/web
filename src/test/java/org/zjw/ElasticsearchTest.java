@@ -35,7 +35,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.zjw.web.entity.User;
+import org.zjw.web.entity.User2;
 import org.zjw.web.util.RandomName;
 
 import java.io.IOException;
@@ -599,7 +599,7 @@ public class ElasticsearchTest {
     public void batchInsert() {
         BulkRequestBuilder bulkRequest = client.prepareBulk();
 
-        User user = new User();
+        User2 user = new User2();
         for (int i = 0; i < 100; i++) {
             user.setName(RandomName.getEnglishName());
             Random random = new Random();

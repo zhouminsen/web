@@ -5,6 +5,7 @@ import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.TransactionDefinition;
 import org.springframework.transaction.TransactionStatus;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.DefaultTransactionDefinition;
 import org.springframework.transaction.support.TransactionCallback;
@@ -24,6 +25,7 @@ public class CalcCountService {
     @Autowired
     private DataSourceTransactionManager transactionManager;
 
+    @Transactional(readOnly = false, propagation = Propagation.REQUIRED)
     public void transaction() {
         TransactionTemplate template = new TransactionTemplate(transactionManager);
         template.setIsolationLevel(TransactionDefinition.ISOLATION_READ_COMMITTED);
@@ -41,7 +43,11 @@ public class CalcCountService {
                     calcCount.setVersion(2);
                     calcCountDao.insertSelective(calcCount);
 //                    int i = 1 / 0;
-
+                    CalcCount calcCount1 = calcCountDao.selectByPrimaryKey(22);
+                    calcCount1.setVersion(100);
+                    calcCountDao.updateByPrimaryKeySelective(calcCount1);
+                    CalcCount calcCount2 = calcCountDao.selectByPrimaryKey(22);
+                    System.out.println(calcCount2);
                 } catch (Exception e) {
                     e.printStackTrace();
                     transactionStatus.setRollbackOnly();

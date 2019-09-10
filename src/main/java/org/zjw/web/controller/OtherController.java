@@ -50,4 +50,5 @@ public class OtherController {
     public void testProxyObject(HttpServletRequest request) {
         System.out.println(userService);
     }
+
 }
