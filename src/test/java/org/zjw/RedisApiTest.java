@@ -4,13 +4,16 @@ import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.data.redis.core.RedisOperations;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.SessionCallback;
 import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.data.redis.core.ZSetOperations;
 import org.zjw.web.util.LockModel;
 import org.zjw.web.util.LockUtil;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -20,8 +23,6 @@ public class RedisApiTest extends BaseTest {
 
     @Autowired
     private StringRedisTemplate stringRedisTemplate;
-    @Autowired
-    private RedisTemplate<String, Object> redisTemplate;
 
 
     /**
@@ -64,6 +65,23 @@ public class RedisApiTest extends BaseTest {
     }
 
     /**
+     * 测试zset
+     */
+    @Test
+    public void zset() {
+        String set_key = "zset";
+        stringRedisTemplate.opsForZSet().add("1", "周家伟2", 1.2);
+        stringRedisTemplate.opsForZSet().add("1", "周家伟1", 1.1);
+        stringRedisTemplate.opsForZSet().add("1", "周家伟3", 1.5);
+        stringRedisTemplate.opsForZSet().add("1", "周家伟4", 1.3);
+        Set<ZSetOperations.TypedTuple<String>> typedTuples = stringRedisTemplate.boundZSetOps("1").rangeWithScores(1, 5);
+        for (ZSetOperations.TypedTuple<String> item : typedTuples) {
+            System.out.println(item.getValue() + ":" + item.getScore());
+        }
+
+    }
+
+    /**
      * 测试list
      */
     @Test
@@ -88,15 +106,12 @@ public class RedisApiTest extends BaseTest {
         String hash_key = "hash";
 //        https://github.com/Snailclimb/JavaGuide
 
-        redisTemplate.delete(hash_key);
-        Map<String, Object> map = new HashMap<>();
-        map.put("bb", "11");
-        map.put("cc", "22");
-        redisTemplate.opsForHash().put(hash_key, "1", map);
-        System.out.println("是什么：" + redisTemplate.opsForHash().get(hash_key, "1"));
+        stringRedisTemplate.delete(hash_key);
+        stringRedisTemplate.opsForHash().put(hash_key, "1", "zjw");
+        System.out.println(stringRedisTemplate.opsForHash().get(hash_key, "1"));
 
-//        stringRedisTemplate.opsForHash().put(hash_key, "1", "wjz");
-//        System.out.println(stringRedisTemplate.opsForHash().get(hash_key, "1"));
+        stringRedisTemplate.opsForHash().put(hash_key, "1", "wjz");
+        System.out.println(stringRedisTemplate.opsForHash().get(hash_key, "1"));
 
 
     }
