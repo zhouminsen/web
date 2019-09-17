@@ -53,11 +53,8 @@ public class POIExcelExport {
             User item = result.get(i);
             List<String> list = new ArrayList<>();
             list.add((i + 1) + "");
-            list.add(item.getId() + "");
             list.add(item.getName() + "");
             list.add(item.getAge() + "");
-            list.add(item.getAddress() + "");
-            list.add(item.getIdentityCard() + "");
             bodyRow.add(list);
         }
         List<String> titleRow = Arrays.asList(FIN_ACCOUNT);

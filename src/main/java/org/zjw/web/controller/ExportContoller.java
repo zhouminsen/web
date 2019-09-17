@@ -28,11 +28,8 @@ public class ExportContoller {
         List<User> resultList = new ArrayList<>();
         for (int i = 0; i < 10; i++) {
             User user = new User();
-            user.setId(0);
             user.setName("账户" + i);
-            user.setAddress("湖北" + i);
             user.setAge(i);
-            user.setIdentityCard(i);
             resultList.add(user);
         }
         String fileName = "账户列表";
