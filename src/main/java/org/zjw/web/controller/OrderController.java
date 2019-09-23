@@ -50,6 +50,9 @@ public class OrderController {
         Map<String, Object> data = new HashMap<>();
         data.put("order", order);
         map.put("data", data);
+        map.put("customerName", "家伟平台vip2");
+        map.put("type", 0);
+        map.put("id", "d6b184d7162e493e8c7f1c0dde3a9a49");
         map.put("code", 0);
 //        response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
         return map;
